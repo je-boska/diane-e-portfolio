@@ -4,8 +4,8 @@ button {
   color: white;
   border: 2px solid rgba(0, 0, 0, 0.2);
   border-radius: 5px;
-  padding: 8px;
-  margin: 5px 10px 5px 0px;
+  padding: 4px 6px;
+  margin: 5px 0px;
   cursor: pointer;
 }
 
@@ -22,8 +22,12 @@ button:hover {
   opacity: 0.75;
 }
 
-button:focus {
+button:active {
   opacity: 0.4;
+}
+
+.create-post-button {
+  margin-right: 10px;
 }
 
 .admin-buttons {
@@ -32,30 +36,36 @@ button:focus {
 }
 
 .delete-edit-buttons {
-  width: 160px;
+  /* width: 160px; */
   text-align: right;
+  margin: 5px 0px 5px 0px;
 }
 
 .post-card {
   max-width: 700px;
   border-radius: 10px;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  margin: 30px auto;
-  padding: 20px;
-  box-shadow: 0px 5px 17px rgba(0, 0, 0, 0.12);
+  margin: 30px 5px;
+  padding: 8px;
+  /* box-shadow: 0px 5px 17px rgba(0, 0, 0, 0.12); */
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .section-previews {
-  width: 500px;
+  width: 300px;
   display: flex;
   justify-content: right;
   align-items: center;
 }
 
+.up-down-arrows {
+  width: 35px;
+}
+
 .up-down-arrows button {
+  margin: 0px;
   color: black;
   background-color: transparent;
   border: none;
@@ -63,4 +73,28 @@ button:focus {
 
 .up-down-arrows button:focus {
   outline: 0;
+}
+
+@media only screen and (min-width: 565px) {
+  button {
+    padding: 8px;
+    margin: 5px 10px 5px 0px;
+  }
+
+  .post-card {
+    margin: 30px auto;
+    padding: 20px;
+  }
+
+  .section-previews {
+    width: 500px;
+  }
+
+  .up-down-arrows {
+    width: 50px;
+  }
+
+  .up-down-arrows button {
+    margin: 5px 0px;
+  }
 }

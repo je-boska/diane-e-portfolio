@@ -1,8 +1,8 @@
 .add-section-button {
   color: black;
   background-color: transparent;
-  width: 100px;
-  height: 80px;
+  width: 60px;
+  height: 48px;
   margin: 20px 0px;
   padding: 20px;
   border-radius: 5px;
@@ -16,9 +16,11 @@
 }
 
 .form-container {
-  width: 600px;
-  margin: 30px 50%;
-  transform: translateX(-50%);
+  margin: 30px 10px;
+}
+
+.cancel-button {
+  margin-right: 10px;
 }
 
 .form-container input,
@@ -29,9 +31,10 @@
   font-family: monospace, sans-serif;
   margin: 20px 0px;
   padding: 20px;
+  width: 340px;
   border-radius: 10px;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  box-shadow: 0px 5px 17px rgba(0, 0, 0, 0.12);
+  /* box-shadow: 0px 5px 17px rgba(0, 0, 0, 0.12); */
 }
 
 .form-container input[type='file'] {
@@ -49,4 +52,17 @@
 
 .image-preview img {
   width: 100%;
+}
+
+@media only screen and (min-width: 600px) {
+  .add-section-button {
+    width: 100px;
+    height: 80px;
+  }
+
+  .form-container {
+    width: 600px;
+    margin: 30px 50%;
+    transform: translateX(-50%);
+  }
 }
