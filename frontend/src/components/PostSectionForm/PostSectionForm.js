@@ -53,7 +53,7 @@ const PostSectionForm = ({
         return
       }
     }
-    setFont('Georgia')
+    setFont('backout')
     setTitle('')
     setText('')
     setImage('')
