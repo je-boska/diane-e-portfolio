@@ -9,6 +9,8 @@ const PostSectionForm = ({
   setSections,
   font,
   setFont,
+  centered,
+  setCentered,
   title,
   setTitle,
   text,
@@ -41,6 +43,7 @@ const PostSectionForm = ({
       newSections[sectionToReplaceIndex] = {
         sectionId,
         font,
+        centered,
         title,
         text,
         image,
@@ -55,6 +58,7 @@ const PostSectionForm = ({
           {
             sectionId: Math.random().toString(36).substring(2, 9),
             font,
+            centered,
             title,
             text,
             image,
@@ -68,6 +72,8 @@ const PostSectionForm = ({
       }
     }
     setFont('backout')
+    setFont('Georgia')
+    setCentered(false)
     setTitle('')
     setText('')
     setImage('')
@@ -141,6 +147,16 @@ const PostSectionForm = ({
           <option value='solide-mirage'>Solide Mirage</option>
         </select>
         <br />
+        <div className='centered-checkbox'>
+          <input
+            type='checkbox'
+            id='centered'
+            name='centered'
+            checked={centered}
+            onChange={() => setCentered(!centered)}
+          />
+          <label htmlFor='centered'>Centered</label>
+        </div>
         <input
           name='title'
           size='50'
@@ -149,6 +165,7 @@ const PostSectionForm = ({
           value={title}
           onChange={titleHandler}
         ></input>
+        <br />
         <br />
         <textarea
           name='text'
@@ -169,6 +186,7 @@ const PostSectionForm = ({
               onClick={() => setSelectBackgroundColor(!selectBackgroundColor)}
             ></div>
           </div>
+
           <div className='color-selector'>
             <p>Text</p>
             <div
