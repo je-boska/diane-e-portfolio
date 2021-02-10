@@ -2,14 +2,15 @@ import React, { useEffect, useContext } from 'react'
 import './EditPostScreen.css'
 import { UserContext } from '../../UserContext'
 import useForm from '../../hooks/UseForm'
+import PostSectionForm from '../../components/PostSectionForm/PostSectionForm'
+import SectionPreview from '../../components/SectionPreview/SectionPreview'
+import { deletePost } from '../../requests/AdminRequests'
 import {
   submitForm,
-  cancelForm,
   checkImageInDatabase,
   deleteImage,
 } from '../../requests/EditPostRequests'
-import PostSectionForm from '../../components/PostSectionForm/PostSectionForm'
-import SectionPreview from '../../components/SectionPreview/SectionPreview'
+import { isCreatePost } from '../../utils/utils'
 
 const EditPostScreen = ({ match, history }) => {
   const { user } = useContext(UserContext)
@@ -31,21 +32,16 @@ const EditPostScreen = ({ match, history }) => {
     getPost,
     getPostsLength,
   } = useForm()
+
   const {
     sections,
-    position,
-    font,
-    centered,
-    title,
-    text,
-    image,
-    color,
-    backgroundColor,
     sectionId,
+    position,
+    image,
+    postsLength,
+    imageCleanupPublish,
     loading,
     sectionSaved,
-    imageCleanupPublish,
-    postsLength,
   } = values
 
   useEffect(() => {
@@ -60,78 +56,85 @@ const EditPostScreen = ({ match, history }) => {
     }
   }, [user, history])
 
-  function isCreatePost() {
-    const urlParams = new URLSearchParams(window.location.search)
-    const createPost = urlParams.get('create')
-    return createPost
-  }
-
-  const submitHandler = async e => {
+  async function submitHandler(e) {
     e.preventDefault()
     const createPost = isCreatePost()
-    for (let i = 0; i < imageCleanupPublish.length; i++) {
-      deleteImage(imageCleanupPublish[i], user.token)
-    }
-    await submitForm(match.params.id, user.token, {
-      sections,
-      position: createPost ? postsLength : position,
-    })
-    history.push('/admin')
-  }
-
-  const cancelHandler = async e => {
-    e.preventDefault()
-    setLoading(true)
-    await cancelForm(
-      window.location.search,
-      user.token,
-      match.params.id,
-      sections,
-      image
+    imageCleanupPublish.forEach(image => deleteImage(image, user.token))
+    await submitForm(
+      {
+        sections,
+        position: createPost ? postsLength : position,
+        _id: match.params.id,
+      },
+      user.token
     )
     history.push('/admin')
   }
 
-  const changeSectionHandler = async section => {
-    const {
-      font,
-      centered,
-      title,
-      text,
-      image,
-      color,
-      backgroundColor,
-      sectionId,
-    } = section
-    const createPost = isCreatePost()
-    // When editing post, delete image only if image not in db
-    if (image && !createPost && !sectionSaved) {
-      const imageInDb = await checkImageInDatabase(image, match.params.id)
-      if (!imageInDb) {
-        deleteImage(image, user.token)
-      }
-      // When creating post, delete image if not saved
-    } else if (createPost && !sectionSaved) {
-      if (image) {
-        let imageSaved = false
-        for (let i = 0; i < sections.length; i++) {
-          if (image === sections[i].image) {
-            imageSaved = true
-          }
-        }
-        if (!imageSaved) {
-          deleteImage(image, user.token)
-        }
-      }
+  function deleteAllImages() {
+    sections.forEach(section => {
+      section.image && deleteImage(section.image, user.token)
+    })
+    if (image) {
+      deleteImage(image, user.token)
     }
-    setFont(font)
-    setCentered(centered)
-    setTitle(title)
-    setText(text)
-    setImage(image)
-    setColor(color)
-    setBackgroundColor(backgroundColor)
-    setSectionId(sectionId)
+  }
+
+  async function deleteAllImagesIfNotInDb() {
+    sections.forEach(async section => {
+      const imageInDb = await checkImageInDatabase(
+        section.image,
+        match.params.id
+      )
+      !imageInDb && deleteImage(section.image, user.token)
+    })
+    if (image) {
+      const imageInDb = await checkImageInDatabase(image, match.params.id)
+      !imageInDb && deleteImage(image, user.token)
+    }
+  }
+
+  async function cancelHandler(e) {
+    e.preventDefault()
+    setLoading(true)
+    const createPost = isCreatePost()
+    if (createPost) {
+      deleteAllImages()
+      await deletePost(user.token, match.params.id)
+    } else {
+      deleteAllImagesIfNotInDb()
+    }
+    history.push('/admin')
+  }
+
+  async function changeSectionHandler(section) {
+    const imageInDb = await checkImageInDatabase(image, match.params.id)
+    const imageSaved = checkImageSaved()
+    if (image && !imageInDb && !imageSaved) {
+      deleteImage(image, user.token)
+    }
+    setFormToSection(section)
+  }
+
+  function checkImageSaved() {
+    let imageSaved = false
+    sections.forEach(section => {
+      if (image === section.image) {
+        imageSaved = true
+      }
+    })
+    return imageSaved
+  }
+
+  function setFormToSection(section) {
+    setFont(section.font)
+    setCentered(section.centered)
+    setTitle(section.title)
+    setText(section.text)
+    setImage(section.image)
+    setColor(section.color)
+    setBackgroundColor(section.backgroundColor)
+    setSectionId(section.sectionId)
   }
 
   function resetForm() {
@@ -140,6 +143,8 @@ const EditPostScreen = ({ match, history }) => {
     setTitle('')
     setText('')
     setImage('')
+    setColor('#FFFFFF')
+    setBackgroundColor('#000000')
   }
 
   function addSectionHandler(e) {
@@ -176,15 +181,13 @@ const EditPostScreen = ({ match, history }) => {
         <button
           className='cancel-button'
           onClick={cancelHandler}
-          disabled={loading}
-        >
+          disabled={loading}>
           <h3>CANCEL</h3>
         </button>
         <button
           className='publish-button'
           onClick={submitHandler}
-          disabled={loading || !sectionSaved}
-        >
+          disabled={loading || !sectionSaved}>
           <h3>PUBLISH</h3>
         </button>
       </div>
@@ -207,29 +210,19 @@ const EditPostScreen = ({ match, history }) => {
         )}
       </div>
       <PostSectionForm
-        sections={sections}
-        font={font}
+        values={values}
         setFont={setFont}
-        centered={centered}
         setCentered={setCentered}
-        title={title}
         setTitle={setTitle}
-        text={text}
         setText={setText}
-        image={image}
         setImage={setImage}
-        color={color}
         setColor={setColor}
-        backgroundColor={backgroundColor}
         setBackgroundColor={setBackgroundColor}
-        sectionId={sectionId}
         setSectionId={setSectionId}
-        loading={loading}
         setLoading={setLoading}
         setSections={setSections}
         sectionSaved={sectionSaved}
         setSectionSaved={setSectionSaved}
-        imageCleanupPublish={imageCleanupPublish}
         setImageCleanupPublish={setImageCleanupPublish}
         token={user.token}
       />

@@ -1,4 +1,4 @@
-describe('Create post', () => {
+describe('Move post', () => {
   before(() => {
     cy.visit('http://localhost:3000/login')
 
@@ -25,7 +25,19 @@ describe('Create post', () => {
     cy.location('pathname').should('eq', '/admin')
   })
 
-  it('Checks for newly created post', () => {
+  it('Clicks the down arrow', () => {
+    cy.get('.down-arrow').first().click()
+  })
+
+  it('Checks that the created post has moved down', () => {
+    cy.get('.post-card').eq(1).should('contain', 'Test post')
+  })
+
+  it('Clicks the up arrow', () => {
+    cy.get('.up-arrow').eq(1).click()
+  })
+
+  it('Checks that the created post has moved up', () => {
     cy.get('.post-card').first().should('contain', 'Test post')
   })
 
@@ -34,6 +46,6 @@ describe('Create post', () => {
     cy.on('window:confirm', () => true)
     cy.wait(500)
 
-    cy.get('.post-card').first().should('not.contain', 'Test post')
+    cy.get('.post-card').eq(1).should('not.contain', 'Test post')
   })
 })

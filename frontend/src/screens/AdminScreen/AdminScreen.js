@@ -33,25 +33,27 @@ const AdminScreen = ({ history }) => {
     setLoading(true)
     if (window.confirm('Are you sure?')) {
       await deletePost(user.token, id)
-      const rearrangedPosts = posts
-        .filter(post => post.position !== deletePosition)
-        .map(post => {
-          return {
-            ...post,
-            position:
-              post.position > deletePosition
-                ? post.position - 1
-                : post.position,
-          }
-        })
-      for (let i = 0; i < rearrangedPosts.length; i++) {
-        if (rearrangedPosts[i].position >= deletePosition) {
-          submitForm(rearrangedPosts[i]._id, user.token, rearrangedPosts[i])
+      const rearrangedPosts = rearrangeOnDelete(deletePosition)
+      rearrangedPosts.forEach(post => {
+        if (post.position >= deletePosition) {
+          submitForm(post, user.token)
         }
-      }
+      })
       setPosts(rearrangedPosts)
     }
     setLoading(false)
+  }
+
+  function rearrangeOnDelete(deletePosition) {
+    return posts
+      .filter(post => post.position !== deletePosition)
+      .map(post => {
+        return {
+          ...post,
+          position:
+            post.position > deletePosition ? post.position - 1 : post.position,
+        }
+      })
   }
 
   async function createPostHandler() {
@@ -61,7 +63,7 @@ const AdminScreen = ({ history }) => {
 
   function logoutHandler() {
     setUser(null)
-    sessionStorage.removeItem('user')
+    localStorage.removeItem('user')
   }
 
   function movePostUpHandler(position) {
@@ -81,7 +83,7 @@ const AdminScreen = ({ history }) => {
         rearrangedPosts[i].position === position ||
         rearrangedPosts[i].position === position + 1
       ) {
-        submitForm(rearrangedPosts[i]._id, user.token, rearrangedPosts[i])
+        submitForm(rearrangedPosts[i], user.token)
       }
     }
     setPosts(rearrangedPosts)
@@ -104,7 +106,7 @@ const AdminScreen = ({ history }) => {
         rearrangedPosts[i].position === position ||
         rearrangedPosts[i].position === position - 1
       ) {
-        submitForm(rearrangedPosts[i]._id, user.token, rearrangedPosts[i])
+        submitForm(rearrangedPosts[i], user.token)
       }
     }
     setPosts(rearrangedPosts)
@@ -125,11 +127,15 @@ const AdminScreen = ({ history }) => {
         .map(post => (
           <div className='post-card' key={post._id}>
             <div className='up-down-arrows'>
-              <button onClick={() => movePostUpHandler(post.position)}>
+              <button
+                className='up-arrow'
+                onClick={() => movePostUpHandler(post.position)}>
                 <h3>↑</h3>
               </button>
               <br />
-              <button onClick={() => movePostDownHandler(post.position)}>
+              <button
+                className='down-arrow'
+                onClick={() => movePostDownHandler(post.position)}>
                 <h3>↓</h3>
               </button>
             </div>
@@ -140,13 +146,13 @@ const AdminScreen = ({ history }) => {
             </div>
             <div className='delete-edit-buttons'>
               <button
-                className='delete-edit-button'
+                className='delete-edit-button delete-button'
                 onClick={() => deleteHandler(post._id, post.position)}
                 disabled={loading}>
                 <i className='fas fa-trash-alt' />
               </button>
               <Link to={`/admin/edit/${post._id}`}>
-                <button className='delete-edit-button'>
+                <button className='delete-edit-button edit-button'>
                   <i className='fas fa-edit' />
                 </button>
               </Link>

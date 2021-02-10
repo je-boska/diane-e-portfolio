@@ -19,13 +19,13 @@ export async function uploadImage(image, token) {
   return data.data
 }
 
-export async function submitForm(id, token, data) {
+export async function submitForm(post, token) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
   }
 
-  await axios.put(`/api/posts/${id}`, data, { headers })
+  await axios.put(`/api/posts/${post._id}`, post, { headers })
 }
 
 export function deleteImage(image, token) {
@@ -40,52 +40,10 @@ export function deleteImage(image, token) {
 export async function checkImageInDatabase(image, id) {
   const data = await getPostData(id)
   const postImages = []
-  for (let i = 0; i < data.sections.length; i++) {
-    postImages.push(data.sections[i].image)
-  }
+  data.sections.forEach(section => postImages.push(section.image))
   if (postImages.includes(image)) {
     return true
   } else {
     return false
-  }
-}
-
-export async function cancelForm(queryString, token, id, sections, image) {
-  const urlParams = new URLSearchParams(queryString)
-  const createPost = urlParams.get('create')
-
-  if (createPost) {
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    }
-    await axios.delete(`/api/posts/${id}`, {
-      headers,
-    })
-    // If post was made using Create Post, delete all images
-    for (let i = 0; i < sections.length; i++) {
-      if (sections[i].image) {
-        deleteImage(sections[i].image, token)
-      }
-    }
-    if (image) {
-      deleteImage(image, token)
-    }
-  } else {
-    // If post existed and is being edited,
-    // Compare post in database to current images,
-    // Delete images not in database post
-    for (let i = 0; i < sections.length; i++) {
-      if (sections[i].image) {
-        const imageInDb = await checkImageInDatabase(sections[i].image, id)
-        if (!imageInDb) {
-          deleteImage(sections[i].image, token)
-        }
-      }
-    }
-    // Cleanup current image as well, if not in DB
-    const imageInDb = await checkImageInDatabase(image, id)
-    if (image && !imageInDb) {
-      deleteImage(image, token)
-    }
   }
 }

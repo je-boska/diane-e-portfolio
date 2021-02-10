@@ -5,31 +5,34 @@ import Loader from '../Loader/Loader'
 import { SketchPicker } from 'react-color'
 
 const PostSectionForm = ({
-  sections,
+  values,
   setSections,
-  font,
   setFont,
-  centered,
   setCentered,
-  title,
   setTitle,
-  text,
   setText,
-  image,
   setImage,
-  color,
   setColor,
-  backgroundColor,
   setBackgroundColor,
-  sectionId,
   setSectionId,
-  loading,
   setLoading,
   token,
   setSectionSaved,
-  imageCleanupPublish,
   setImageCleanupPublish,
 }) => {
+  const {
+    sections,
+    font,
+    centered,
+    title,
+    text,
+    image,
+    color,
+    backgroundColor,
+    sectionId,
+    loading,
+    imageCleanupPublish,
+  } = values
   const [selectColor, setSelectColor] = useState(false)
   const [selectBackgroundColor, setSelectBackgroundColor] = useState(false)
 
@@ -71,7 +74,7 @@ const PostSectionForm = ({
         return
       }
     }
-    setFont('Georgia')
+    setFont('format1452')
     setCentered(false)
     setTitle('')
     setText('')
@@ -135,17 +138,6 @@ const PostSectionForm = ({
           {loading ? <Loader /> : <h3>SAVE</h3>}
         </button>
         <br />
-        <select
-          name='font-select'
-          className='font-select'
-          value={font}
-          onChange={fontHandler}
-        >
-          <option value='format1452'>Format 1452</option>
-          <option value='cirrus-cumulus'>Cirrus Cumulus</option>
-          <option value='solide-mirage'>Solide Mirage</option>
-        </select>
-        <br />
         <div className='centered-checkbox'>
           <input
             type='checkbox'
@@ -156,6 +148,19 @@ const PostSectionForm = ({
           />
           <label htmlFor='centered'>Centered</label>
         </div>
+        <select
+          name='font-select'
+          className='font-select'
+          value={font}
+          onChange={fontHandler}
+        >
+          <option value='pyromaani'>Pyromaani</option>
+          <option value='modell-envelo'>Modell Envelo</option>
+          <option value='synuous-bold'>Synuous Bold</option>
+          <option value='rbno31'>RBNo3.1</option>
+        </select>
+        <br />
+
         <input
           name='title'
           size='50'
@@ -164,7 +169,6 @@ const PostSectionForm = ({
           value={title}
           onChange={titleHandler}
         ></input>
-        <br />
         <br />
         <textarea
           name='text'
@@ -176,6 +180,7 @@ const PostSectionForm = ({
           onChange={textHandler}
         ></textarea>
         <br />
+
         <div className='color-selectors'>
           <div className='color-selector'>
             <p>Background</p>
@@ -213,7 +218,7 @@ const PostSectionForm = ({
             />
           ) : null}
         </div>
-        <br />
+
         {image && !loading && (
           <button onClick={removeImageHandler} id='remove-img-button'>
             <h3>- REMOVE IMAGE</h3>

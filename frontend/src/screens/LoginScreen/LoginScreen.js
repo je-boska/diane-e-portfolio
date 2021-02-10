@@ -16,8 +16,9 @@ const LoginScreen = ({ history }) => {
     setLoading(true)
     try {
       const data = await authUser(email, password)
-      sessionStorage.setItem('user', data)
-      setUser(data)
+      const userToken = { token: data.token }
+      localStorage.setItem('user', userToken)
+      setUser(userToken)
       setLoading(false)
     } catch (err) {
       setError(true)
@@ -36,7 +37,7 @@ const LoginScreen = ({ history }) => {
       <div className='form-container login'>
         <form onSubmit={submitHandler}>
           <label htmlFor='email'>
-            <h2>Email</h2>
+            <p>Email</p>
           </label>
           <input
             name='email'
@@ -44,7 +45,7 @@ const LoginScreen = ({ history }) => {
             value={email}
             onChange={e => setEmail(e.target.value)}></input>
           <label htmlFor='password'>
-            <h2>Password</h2>
+            <p>Password</p>
           </label>
           <input
             name='password'
